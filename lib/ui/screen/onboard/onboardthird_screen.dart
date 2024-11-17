@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:alaremmu/ui/screen/dashboard/home_screen.dart';
+// import 'package:alaremmu/lib/ui/screen/dashboard/home_screen.dart'; // Pastikan path ini sesuai dengan struktur folder Anda
 
 class OnboardThirdScreen extends StatelessWidget {
   @override
@@ -14,7 +16,12 @@ class OnboardThirdScreen extends StatelessWidget {
               alignment: Alignment.topRight,
               child: TextButton(
                 onPressed: () {
-
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => HomeScreen(),
+                    ),
+                  );
                 },
                 child: Text(
                   'Skip',
@@ -81,7 +88,12 @@ class OnboardThirdScreen extends StatelessWidget {
                 Spacer(flex: 2),
                 ElevatedButton(
                   onPressed: () {
-
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => HomeScreen(),
+                      ),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     shape: CircleBorder(),

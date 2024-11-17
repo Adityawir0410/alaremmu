@@ -1,7 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:alaremmu/ui/screen/splash_screen/splash_screen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Inisialisasi Supabase
+  await Supabase.initialize(
+    url: 'https://lkezyphtpcgkxrfqbrni.supabase.co',
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxrZXp5cGh0cGNna3hyZnFicm5pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzE3ODA2OTEsImV4cCI6MjA0NzM1NjY5MX0.k7GhRDy_ciEXrs0qz5FCsubkc4VLNsjcU8LaGrXIyOU',
+  );
+
   runApp(const MyApp());
 }
 
@@ -17,7 +26,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       debugShowCheckedModeBanner: false,
-      home: SplashScreen(), 
+      home: SplashScreen(),
     );
   }
 }

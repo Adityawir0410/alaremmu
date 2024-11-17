@@ -35,6 +35,8 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
+  supabase_flutter: ^1.6.2
+  intl: ^0.20.0
 
 dev_dependencies:
   flutter_test:
@@ -63,6 +65,23 @@ flutter:
     - assets/onboard/onboard1.png
     - assets/onboard/onboard2.png
     - assets/onboard/onboard3.png
+    - assets/homescreen/banneratas.png
+    - assets/homescreen/kardiologi.png
+    - assets/homescreen/neurologi.png
+    - assets/homescreen/ortopedi.png
+    - assets/kategoridokter/temukandokter.png
+    - assets/kategoridokter/dentist.png
+    - assets/kategoridokter/dermatologi.png
+    - assets/kategoridokter/gastroenterologi.png
+    - assets/kategoridokter/hematologi.png
+    - assets/kategoridokter/nefrologi.png
+    - assets/kategoridokter/oftalmologi.png
+    - assets/kategoridokter/onkologi.png
+    - assets/kategoridokter/pulmonolog.png
+    - assets/kategoridokter/tht.png
+    - assets/kategoridokter/neurologi2.png
+    - assets/kategoridokter/kardiologi2.png
+    - assets/kategoridokter/ortopedi2.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
