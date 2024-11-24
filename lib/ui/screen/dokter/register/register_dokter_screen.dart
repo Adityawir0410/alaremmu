@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:alaremmu/ui/widget/register/tanggal/tanggal_widget.dart';
 import 'package:alaremmu/ui/widget/register/waktu/waktu_widget.dart';
+import 'package:alaremmu/ui/widget/review/review_widget.dart';
 import 'package:alaremmu/ui/screen/dokter/datapasien/datapasien_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -32,47 +33,55 @@ class _RegisterDokterScreenState extends State<RegisterDokterScreen> {
   int selectedDateIndex = 0;
   String? selectedTime;
 
-  // Fungsi untuk menyimpan data appointment
-  void _saveAppointment() async {
+  Future<void> _saveAppointment() async {
     final selectedDate =
         DateTime.now().add(Duration(days: selectedDateIndex)).toIso8601String();
 
     if (selectedTime == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Pilih waktu terlebih dahulu!")),
+        const SnackBar(content: Text("Pilih waktu terlebih dahulu!")),
       );
       return;
     }
 
-    final response = await Supabase.instance.client
-        .from('appointments')
-        .insert({
-          'doctor_id': widget.doctorId,
-          'date': selectedDate,
-          'time_slot': selectedTime,
-        })
-        .select('id')
-        .single();
+    try {
+      final response = await Supabase.instance.client
+          .from('appointments')
+          .insert({
+            'doctor_id': widget.doctorId,
+            'date': selectedDate,
+            'time_slot': selectedTime,
+          })
+          .select()
+          .single(); // Retrieve the inserted data
 
-    if (response == null || response.containsKey('error')) {
-      print("Error: ${response['error']}");
-      return;
-    }
+      if (response == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Gagal membuat janji temu.")),
+        );
+        return;
+      }
 
-// Ambil ID dari respons
-    final appointmentId = response['id'];
+      final appointmentId = response['id'];
 
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => DataPasienScreen(
-          appointmentId: appointmentId,
-          doctorName: widget.name,
-          appointmentDate: selectedDate, // Kirim tanggal pemeriksaan
-          appointmentTime: selectedTime!, // Kirim waktu pemeriksaan
+      // Navigate to DataPasienScreen
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => DataPasienScreen(
+            appointmentId: appointmentId,
+            doctorName: widget.name,
+            appointmentDate: selectedDate,
+            appointmentTime: selectedTime!,
+          ),
         ),
-      ),
-    );
+      );
+    } catch (e) {
+      print("Error during appointment saving: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Terjadi kesalahan saat menyimpan janji temu.")),
+      );
+    }
   }
 
   @override
@@ -90,12 +99,12 @@ class _RegisterDokterScreenState extends State<RegisterDokterScreen> {
                   width: double.infinity,
                   height: 140,
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
+                    gradient: const LinearGradient(
                       colors: [Color(0xFF168AAD), Color(0xFF76BDC2)],
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                     ),
-                    borderRadius: BorderRadius.only(
+                    borderRadius: const BorderRadius.only(
                       bottomLeft: Radius.circular(20),
                       bottomRight: Radius.circular(20),
                     ),
@@ -110,7 +119,7 @@ class _RegisterDokterScreenState extends State<RegisterDokterScreen> {
                         onTap: () {
                           Navigator.pop(context);
                         },
-                        child: CircleAvatar(
+                        child: const CircleAvatar(
                           radius: 20,
                           backgroundColor: Colors.white,
                           child: Icon(
@@ -120,8 +129,8 @@ class _RegisterDokterScreenState extends State<RegisterDokterScreen> {
                           ),
                         ),
                       ),
-                      SizedBox(width: 24),
-                      Text(
+                      const SizedBox(width: 24),
+                      const Text(
                         "Registrasi",
                         style: TextStyle(
                           fontSize: 30,
@@ -134,9 +143,9 @@ class _RegisterDokterScreenState extends State<RegisterDokterScreen> {
                 ),
               ],
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
 
-            // Detail Dokter
+            // Doctor Details
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Row(
@@ -145,15 +154,16 @@ class _RegisterDokterScreenState extends State<RegisterDokterScreen> {
                     radius: 40,
                     backgroundImage: widget.imageUrl.isNotEmpty
                         ? NetworkImage(widget.imageUrl)
-                        : AssetImage('assets/placeholder.png') as ImageProvider,
+                        : const AssetImage('assets/placeholder.png')
+                            as ImageProvider,
                   ),
-                  SizedBox(width: 16),
+                  const SizedBox(width: 16),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         widget.name,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                           color: Color(0xFF0B4557),
@@ -161,24 +171,24 @@ class _RegisterDokterScreenState extends State<RegisterDokterScreen> {
                       ),
                       Text(
                         widget.specialization,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 16,
                           color: Color(0xFF0B4557),
                         ),
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       Row(
                         children: [
-                          Icon(Icons.star, size: 16, color: Colors.amber),
-                          SizedBox(width: 4),
+                          const Icon(Icons.star, size: 16, color: Colors.amber),
+                          const SizedBox(width: 4),
                           Text(
-                            "${widget.rating.toStringAsFixed(1)}",
+                            widget.rating.toStringAsFixed(1),
                             style: TextStyle(
                               fontSize: 14,
                               color: Colors.grey[700],
                             ),
                           ),
-                          SizedBox(width: 4),
+                          const SizedBox(width: 4),
                           Text(
                             "(${widget.reviews})",
                             style: TextStyle(
@@ -193,12 +203,12 @@ class _RegisterDokterScreenState extends State<RegisterDokterScreen> {
                 ],
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
 
             // Tentang Dokter
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Text(
+              child: const Text(
                 "Tentang Dokter",
                 style: TextStyle(
                   fontSize: 18,
@@ -217,7 +227,7 @@ class _RegisterDokterScreenState extends State<RegisterDokterScreen> {
                 ),
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
 
             // Pilih Tanggal
             TanggalWidget(
@@ -228,20 +238,24 @@ class _RegisterDokterScreenState extends State<RegisterDokterScreen> {
                 });
               },
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
 
             // Pilih Waktu
             WaktuWidget(
-              doctorId: widget.doctorId, // Sertakan doctorId
+              doctorId: widget.doctorId,
               onTimeSelected: (time) {
-                // Callback untuk waktu terpilih
                 setState(() {
                   selectedTime = time;
                 });
               },
             ),
 
-            SizedBox(height: 30),
+            // Review Widget
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: ReviewWidget(doctorId: widget.doctorId),
+            ),
+            const SizedBox(height: 30),
 
             // Tombol Lanjutkan
             Padding(
@@ -249,13 +263,13 @@ class _RegisterDokterScreenState extends State<RegisterDokterScreen> {
               child: ElevatedButton(
                 onPressed: _saveAppointment,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFF168AAD),
+                  backgroundColor: const Color(0xFF168AAD),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14.0),
                   ),
-                  minimumSize: Size(double.infinity, 50),
+                  minimumSize: const Size(double.infinity, 50),
                 ),
-                child: Text(
+                child: const Text(
                   'Lanjutkan',
                   style: TextStyle(
                     fontSize: 16,
@@ -265,7 +279,7 @@ class _RegisterDokterScreenState extends State<RegisterDokterScreen> {
                 ),
               ),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
           ],
         ),
       ),

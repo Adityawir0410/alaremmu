@@ -7,13 +7,13 @@ class DetailJadwalScreen extends StatelessWidget {
   final String doctorName;
   final String appointmentDate;
   final String appointmentTime;
-  final String status; // Tambahkan parameter status
+  final String status;
 
   const DetailJadwalScreen({
     required this.doctorName,
     required this.appointmentDate,
     required this.appointmentTime,
-    required this.status, // Tambahkan parameter status
+    required this.status,
     Key? key,
   }) : super(key: key);
 
@@ -21,14 +21,14 @@ class DetailJadwalScreen extends StatelessWidget {
     try {
       final response = await Supabase.instance.client
           .from('doctors')
-          .select('specialization, rating, reviews, tentang_dokter, image_url')
+          .select('id, specialization, rating, reviews, tentang_dokter, image_url')
           .eq('name', doctorName)
           .single()
           .execute();
 
       return response.data as Map<String, dynamic>?;
     } catch (e) {
-      print("Exception while fetching doctor details: $e");
+      print("Error fetching doctor details: $e");
       return null;
     }
   }
@@ -43,10 +43,11 @@ class DetailJadwalScreen extends StatelessWidget {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError || snapshot.data == null) {
-            return Center(child: Text('Gagal memuat detail dokter.'));
+            return const Center(child: Text('Gagal memuat detail dokter.'));
           }
 
           final doctorDetails = snapshot.data!;
+          final doctorId = doctorDetails['id'];
           final specialization = doctorDetails['specialization'] ?? 'N/A';
           final rating = doctorDetails['rating'] ?? 0.0;
           final reviews = doctorDetails['reviews'] ?? 0;
@@ -70,7 +71,7 @@ class DetailJadwalScreen extends StatelessWidget {
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
                         ),
-                        borderRadius: BorderRadius.only(
+                        borderRadius: const BorderRadius.only(
                           bottomLeft: Radius.circular(20),
                           bottomRight: Radius.circular(20),
                         ),
@@ -85,7 +86,7 @@ class DetailJadwalScreen extends StatelessWidget {
                             onTap: () {
                               Navigator.pop(context);
                             },
-                            child: CircleAvatar(
+                            child: const CircleAvatar(
                               radius: 20,
                               backgroundColor: Colors.white,
                               child: Icon(
@@ -95,8 +96,8 @@ class DetailJadwalScreen extends StatelessWidget {
                               ),
                             ),
                           ),
-                          SizedBox(width: 24),
-                          Text(
+                          const SizedBox(width: 24),
+                          const Text(
                             "Detail Jadwal",
                             style: TextStyle(
                               fontSize: 30,
@@ -109,7 +110,7 @@ class DetailJadwalScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
 
                 // Doctor Information
                 Padding(
@@ -120,16 +121,16 @@ class DetailJadwalScreen extends StatelessWidget {
                         radius: 40,
                         backgroundImage: imageUrl.isNotEmpty
                             ? NetworkImage(imageUrl)
-                            : AssetImage('assets/placeholder.png')
+                            : const AssetImage('assets/placeholder.png')
                                 as ImageProvider,
                       ),
-                      SizedBox(width: 16),
+                      const SizedBox(width: 16),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             doctorName,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
                               color: Color(0xFF0B4557),
@@ -139,17 +140,17 @@ class DetailJadwalScreen extends StatelessWidget {
                             specialization,
                             style: TextStyle(
                               fontSize: 16,
-                              color: Color(0xFF0B4557).withOpacity(0.8),
+                              color: const Color(0xFF0B4557).withOpacity(0.8),
                             ),
                           ),
-                          SizedBox(height: 8),
+                          const SizedBox(height: 8),
                           Row(
                             children: [
-                              Icon(Icons.star, color: Colors.amber, size: 16),
-                              SizedBox(width: 4),
+                              const Icon(Icons.star, color: Colors.amber, size: 16),
+                              const SizedBox(width: 4),
                               Text(
                                 "$rating ($reviews)",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 14,
                                   color: Colors.grey,
                                 ),
@@ -168,7 +169,7 @@ class DetailJadwalScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      const Text(
                         "Tentang Dokter",
                         style: TextStyle(
                           fontSize: 18,
@@ -176,7 +177,7 @@ class DetailJadwalScreen extends StatelessWidget {
                           color: Color(0xFF0B4557),
                         ),
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       Text(
                         description,
                         style: TextStyle(
@@ -188,7 +189,7 @@ class DetailJadwalScreen extends StatelessWidget {
                   ),
                 ),
 
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
 
                 // Queue Information Widget
                 Padding(
@@ -202,10 +203,13 @@ class DetailJadwalScreen extends StatelessWidget {
 
                 // Penilaian Widget (Hanya untuk status "done")
                 if (status == 'done') ...[
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: PenilaianPeriksaWidget(),
+                    child: PenilaianPeriksaWidget(
+                      doctorId: doctorId,
+                      doctorName: doctorName,
+                    ),
                   ),
                 ],
               ],
