@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:alaremmu/ui/widget/jadwalperiksa/jadwal_periksa_widget.dart';
+import 'package:alaremmu/ui/screen/jadwal/detail_jadwal_screen.dart';
 
 class JadwalPemeriksaanScreen extends StatefulWidget {
   @override
@@ -36,6 +37,8 @@ class _JadwalPemeriksaanScreenState extends State<JadwalPemeriksaanScreen> {
       final List<dynamic> data = response.data as List<dynamic>;
 
       final String today = DateFormat('yyyy-MM-dd').format(DateTime.now());
+      final String tomorrow = DateFormat('yyyy-MM-dd')
+          .format(DateTime.now().add(Duration(days: 1)));
 
       setState(() {
         // Filter "Hari Ini" appointments
@@ -222,15 +225,32 @@ class _JadwalPemeriksaanScreenState extends State<JadwalPemeriksaanScreen> {
                               ),
                             ),
                             SizedBox(height: 8),
-                            ...todayAppointments.map((appointment) =>
-                                JadwalPeriksaWidget(
-                                  doctorName: appointment['doctor_name'],
-                                  specialization: dummySpecialization,
-                                  appointmentDate:
-                                      appointment['appointment_date'],
-                                  appointmentTime:
-                                      appointment['appointment_time'],
-                                  doctorImageUrl: dummyImageUrl,
+                            ...todayAppointments.map((appointment) => GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            DetailJadwalScreen(
+                                          doctorName:
+                                              appointment['doctor_name'],
+                                          appointmentDate:
+                                              appointment['appointment_date'],
+                                          appointmentTime:
+                                              appointment['appointment_time'],
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  child: JadwalPeriksaWidget(
+                                    doctorName: appointment['doctor_name'],
+                                    specialization: dummySpecialization,
+                                    appointmentDate:
+                                        appointment['appointment_date'],
+                                    appointmentTime:
+                                        appointment['appointment_time'],
+                                    doctorImageUrl: dummyImageUrl,
+                                  ),
                                 )),
                           ],
                           if (upcomingAppointments.isNotEmpty) ...[
@@ -248,7 +268,68 @@ class _JadwalPemeriksaanScreenState extends State<JadwalPemeriksaanScreen> {
                             ),
                             SizedBox(height: 8),
                             ...upcomingAppointments.map((appointment) =>
-                                JadwalPeriksaWidget(
+                                GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            DetailJadwalScreen(
+                                          doctorName:
+                                              appointment['doctor_name'],
+                                          appointmentDate:
+                                              appointment['appointment_date'],
+                                          appointmentTime:
+                                              appointment['appointment_time'],
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  child: JadwalPeriksaWidget(
+                                    doctorName: appointment['doctor_name'],
+                                    specialization: dummySpecialization,
+                                    appointmentDate:
+                                        appointment['appointment_date'],
+                                    appointmentTime:
+                                        appointment['appointment_time'],
+                                    doctorImageUrl: dummyImageUrl,
+                                  ),
+                                )),
+                          ],
+                        ],
+
+                        // Completed Section
+                        if (!isUpcomingSelected) ...[
+                          Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 16.0),
+                            child: Text(
+                              "Selesai",
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF0B4557),
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 8),
+                          ...completedAppointments.map((appointment) =>
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => DetailJadwalScreen(
+                                        doctorName: appointment['doctor_name'],
+                                        appointmentDate:
+                                            appointment['appointment_date'],
+                                        appointmentTime:
+                                            appointment['appointment_time'],
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: JadwalPeriksaWidget(
                                   doctorName: appointment['doctor_name'],
                                   specialization: dummySpecialization,
                                   appointmentDate:
@@ -256,21 +337,7 @@ class _JadwalPemeriksaanScreenState extends State<JadwalPemeriksaanScreen> {
                                   appointmentTime:
                                       appointment['appointment_time'],
                                   doctorImageUrl: dummyImageUrl,
-                                )),
-                          ],
-                        ],
-
-                        // Completed Section
-                        if (!isUpcomingSelected) ...[
-                          
-                          SizedBox(height: 8),
-                          ...completedAppointments.map((appointment) =>
-                              JadwalPeriksaWidget(
-                                doctorName: appointment['doctor_name'],
-                                specialization: dummySpecialization,
-                                appointmentDate: appointment['appointment_date'],
-                                appointmentTime: appointment['appointment_time'],
-                                doctorImageUrl: dummyImageUrl,
+                                ),
                               )),
                         ],
                       ],
