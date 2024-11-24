@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:alaremmu/ui/widget/register/tanggal/tanggal_widget.dart';
+import 'package:alaremmu/ui/widget/register/waktu/waktu_widget.dart';
+import 'package:alaremmu/ui/screen/dokter/datapasien/datapasien_screen.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class RegisterDokterScreen extends StatefulWidget {
   final String name;
@@ -7,7 +10,8 @@ class RegisterDokterScreen extends StatefulWidget {
   final double rating;
   final int reviews;
   final String imageUrl;
-  final String tentangDokter; // Tambahkan tentangDokter
+  final String tentangDokter;
+  final int doctorId;
 
   const RegisterDokterScreen({
     required this.name,
@@ -16,6 +20,7 @@ class RegisterDokterScreen extends StatefulWidget {
     required this.reviews,
     required this.imageUrl,
     required this.tentangDokter,
+    required this.doctorId,
     Key? key,
   }) : super(key: key);
 
@@ -24,7 +29,51 @@ class RegisterDokterScreen extends StatefulWidget {
 }
 
 class _RegisterDokterScreenState extends State<RegisterDokterScreen> {
-  int selectedDateIndex = 0; // Menyimpan index tanggal yang dipilih
+  int selectedDateIndex = 0;
+  String? selectedTime;
+
+  // Fungsi untuk menyimpan data appointment
+  void _saveAppointment() async {
+    final selectedDate =
+        DateTime.now().add(Duration(days: selectedDateIndex)).toIso8601String();
+
+    if (selectedTime == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Pilih waktu terlebih dahulu!")),
+      );
+      return;
+    }
+
+    final response = await Supabase.instance.client
+        .from('appointments')
+        .insert({
+          'doctor_id': widget.doctorId,
+          'date': selectedDate,
+          'time_slot': selectedTime,
+        })
+        .select('id')
+        .single();
+
+    if (response == null || response.containsKey('error')) {
+      print("Error: ${response['error']}");
+      return;
+    }
+
+// Ambil ID dari respons
+    final appointmentId = response['id'];
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => DataPasienScreen(
+          appointmentId: appointmentId,
+          doctorName: widget.name,
+          appointmentDate: selectedDate, // Kirim tanggal pemeriksaan
+          appointmentTime: selectedTime!, // Kirim waktu pemeriksaan
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -161,7 +210,7 @@ class _RegisterDokterScreenState extends State<RegisterDokterScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Text(
-                widget.tentangDokter, // Tampilkan konten tentangDokter
+                widget.tentangDokter,
                 style: TextStyle(
                   fontSize: 14,
                   color: Colors.grey[700],
@@ -175,10 +224,48 @@ class _RegisterDokterScreenState extends State<RegisterDokterScreen> {
               selectedIndex: selectedDateIndex,
               onDateSelected: (index) {
                 setState(() {
-                  selectedDateIndex = index; // Perbarui tanggal yang dipilih
+                  selectedDateIndex = index;
                 });
               },
             ),
+            SizedBox(height: 16),
+
+            // Pilih Waktu
+            WaktuWidget(
+              doctorId: widget.doctorId, // Sertakan doctorId
+              onTimeSelected: (time) {
+                // Callback untuk waktu terpilih
+                setState(() {
+                  selectedTime = time;
+                });
+              },
+            ),
+
+            SizedBox(height: 30),
+
+            // Tombol Lanjutkan
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: ElevatedButton(
+                onPressed: _saveAppointment,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color(0xFF168AAD),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14.0),
+                  ),
+                  minimumSize: Size(double.infinity, 50),
+                ),
+                child: Text(
+                  'Lanjutkan',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(height: 16),
           ],
         ),
       ),

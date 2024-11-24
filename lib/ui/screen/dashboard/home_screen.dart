@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:alaremmu/ui/widget/homescreen/dokterpopuler_widget.dart';
 import 'package:alaremmu/ui/screen/dokter/kategori/kategori_doktor_screen.dart';
+import 'package:alaremmu/ui/screen/jadwal/jadwal_pemeriksaan_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -26,7 +27,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<Widget> _pages = [
     HomeContentPage(), // Halaman Home
     KategoriDoktorScreen(), // Placeholder untuk tab Dokter
-    Center(child: Text("Jadwal")), // Placeholder untuk tab Jadwal
+    JadwalPemeriksaanScreen(), // Placeholder untuk tab Jadwal
     Center(child: Text("Profil")), // Placeholder untuk tab Profil
   ];
 

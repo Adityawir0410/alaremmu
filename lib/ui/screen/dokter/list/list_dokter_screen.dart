@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:alaremmu/ui/widget/homescreen/dokterpopuler_widget.dart';
 import 'package:alaremmu/ui/screen/dokter/register/register_dokter_screen.dart';
+import 'package:alaremmu/ui/widget/homescreen/dokterpopuler_widget.dart';
 
 class ListDokterScreen extends StatefulWidget {
   final String title;
@@ -14,7 +14,7 @@ class ListDokterScreen extends StatefulWidget {
 
 class _ListDokterScreenState extends State<ListDokterScreen> {
   final supabase = Supabase.instance.client;
-  String searchQuery = ""; // Variabel untuk menyimpan kata kunci pencarian
+  String searchQuery = "";
 
   Future<List<dynamic>> fetchDoctorsByCategory(String category, String query) async {
     try {
@@ -22,7 +22,7 @@ class _ListDokterScreenState extends State<ListDokterScreen> {
           .from('doctors')
           .select()
           .eq('category', category)
-          .ilike('name', '%$query%'); // Mencari nama berdasarkan input pencarian
+          .ilike('name', '%$query%');
       return response;
     } catch (error) {
       print('Error fetching doctors: $error');
@@ -94,7 +94,6 @@ class _ListDokterScreenState extends State<ListDokterScreen> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Container(
-              width: double.infinity,
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(12),
@@ -109,7 +108,7 @@ class _ListDokterScreenState extends State<ListDokterScreen> {
               child: TextField(
                 onChanged: (value) {
                   setState(() {
-                    searchQuery = value; // Memperbarui kata kunci pencarian
+                    searchQuery = value;
                   });
                 },
                 decoration: InputDecoration(
@@ -126,7 +125,7 @@ class _ListDokterScreenState extends State<ListDokterScreen> {
 
           // Daftar Dokter
           Expanded(
-            child: FutureBuilder(
+            child: FutureBuilder<List<dynamic>>(
               future: fetchDoctorsByCategory(widget.title, searchQuery),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
@@ -136,7 +135,7 @@ class _ListDokterScreenState extends State<ListDokterScreen> {
                     child: Text('Error: ${snapshot.error}'),
                   );
                 } else if (snapshot.hasData && snapshot.data != null) {
-                  final doctors = snapshot.data as List<dynamic>;
+                  final doctors = snapshot.data!;
                   if (doctors.isEmpty) {
                     return Center(child: Text('Tidak ada data dokter.'));
                   }
@@ -146,20 +145,23 @@ class _ListDokterScreenState extends State<ListDokterScreen> {
                     itemBuilder: (context, index) {
                       final doctor = doctors[index];
                       return GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => RegisterDokterScreen(
-                                name: doctor['name'] ?? 'Unknown',
-                                specialization: doctor['specialization'] ?? 'Unknown',
-                                rating: (doctor['rating'] ?? 0).toDouble(),
-                                reviews: doctor['reviews'] ?? 0,
-                                imageUrl: doctor['image_url'] ?? '',
-                                tentangDokter: doctor['tentang_dokter'] ?? 'Deskripsi tidak tersedia', // Tambahkan ini
+                        onTap: () async {
+                          if (mounted) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => RegisterDokterScreen(
+                                  name: doctor['name'] ?? 'Unknown',
+                                  specialization: doctor['specialization'] ?? 'Unknown',
+                                  rating: (doctor['rating'] ?? 0).toDouble(),
+                                  reviews: doctor['reviews'] ?? 0,
+                                  imageUrl: doctor['image_url'] ?? '',
+                                  tentangDokter: doctor['tentang_dokter'] ?? 'Deskripsi tidak tersedia',
+                                  doctorId: doctor['id'],
+                                ),
                               ),
-                            ),
-                          );
+                            );
+                          }
                         },
                         child: DokterPopulerWidget(
                           name: doctor['name'] ?? 'Unknown',
