@@ -37,8 +37,6 @@ class _JadwalPemeriksaanScreenState extends State<JadwalPemeriksaanScreen> {
       final List<dynamic> data = response.data as List<dynamic>;
 
       final String today = DateFormat('yyyy-MM-dd').format(DateTime.now());
-      final String tomorrow = DateFormat('yyyy-MM-dd')
-          .format(DateTime.now().add(Duration(days: 1)));
 
       setState(() {
         // Filter "Hari Ini" appointments
@@ -50,6 +48,7 @@ class _JadwalPemeriksaanScreenState extends State<JadwalPemeriksaanScreen> {
                   'doctor_name': entry['doctor_name'] ?? 'Unknown',
                   'appointment_date': entry['appointment_date'] ?? 'Unknown Date',
                   'appointment_time': entry['appointment_time'] ?? 'Unknown Time',
+                  'status': entry['status'] ?? 'Unknown',
                 })
             .toList();
 
@@ -63,6 +62,7 @@ class _JadwalPemeriksaanScreenState extends State<JadwalPemeriksaanScreen> {
                   'doctor_name': entry['doctor_name'] ?? 'Unknown',
                   'appointment_date': entry['appointment_date'] ?? 'Unknown Date',
                   'appointment_time': entry['appointment_time'] ?? 'Unknown Time',
+                  'status': entry['status'] ?? 'Unknown',
                 })
             .toList();
 
@@ -73,13 +73,10 @@ class _JadwalPemeriksaanScreenState extends State<JadwalPemeriksaanScreen> {
                   'doctor_name': entry['doctor_name'] ?? 'Unknown',
                   'appointment_date': entry['appointment_date'] ?? 'Unknown Date',
                   'appointment_time': entry['appointment_time'] ?? 'Unknown Time',
+                  'status': entry['status'] ?? 'Unknown',
                 })
             .toList();
       });
-
-      print("Today's Appointments: $todayAppointments");
-      print("Upcoming Appointments: $upcomingAppointments");
-      print("Completed Appointments: $completedAppointments");
     } catch (e) {
       print("Exception: $e");
     } finally {
@@ -225,7 +222,8 @@ class _JadwalPemeriksaanScreenState extends State<JadwalPemeriksaanScreen> {
                               ),
                             ),
                             SizedBox(height: 8),
-                            ...todayAppointments.map((appointment) => GestureDetector(
+                            ...todayAppointments.map((appointment) =>
+                                GestureDetector(
                                   onTap: () {
                                     Navigator.push(
                                       context,
@@ -238,6 +236,7 @@ class _JadwalPemeriksaanScreenState extends State<JadwalPemeriksaanScreen> {
                                               appointment['appointment_date'],
                                           appointmentTime:
                                               appointment['appointment_time'],
+                                          status: appointment['status'],
                                         ),
                                       ),
                                     );
@@ -281,6 +280,7 @@ class _JadwalPemeriksaanScreenState extends State<JadwalPemeriksaanScreen> {
                                               appointment['appointment_date'],
                                           appointmentTime:
                                               appointment['appointment_time'],
+                                          status: appointment['status'],
                                         ),
                                       ),
                                     );
@@ -325,6 +325,7 @@ class _JadwalPemeriksaanScreenState extends State<JadwalPemeriksaanScreen> {
                                             appointment['appointment_date'],
                                         appointmentTime:
                                             appointment['appointment_time'],
+                                        status: appointment['status'],
                                       ),
                                     ),
                                   );

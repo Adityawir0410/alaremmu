@@ -32,50 +32,50 @@ class _AntrianPeriksaWidgetState extends State<AntrianPeriksaWidget> {
   }
 
   Future<void> _fetchPatientData() async {
-  try {
-    // Fetch data using the Supabase client
-    final response = await Supabase.instance.client
-        .from('patient_appointments')
-        .select('patient_name, nik, phone_number, bpjs_number')
-        .eq('doctor_name', widget.doctorName)
-        .eq('appointment_date', widget.appointmentDate)
-        .eq('appointment_time', widget.appointmentTime)
-        .order('created_at') // Ensure ordered queue based on creation time
-        .execute();
+    try {
+      // Fetch data using the Supabase client
+      final response = await Supabase.instance.client
+          .from('patient_appointments')
+          .select('patient_name, nik, phone_number, bpjs_number, queue_number') // Menambahkan queue_number
+          .eq('doctor_name', widget.doctorName)
+          .eq('appointment_date', widget.appointmentDate)
+          .eq('appointment_time', widget.appointmentTime)
+          .order('created_at')
+          .execute();
 
-    if (response.data != null) {
-      final List<dynamic> data = response.data as List<dynamic>;
+      if (response.data != null) {
+        final List<dynamic> data = response.data as List<dynamic>;
 
-      if (data.isNotEmpty) {
-        // Use the first record as the primary patient
-        final record = data.first;
+        if (data.isNotEmpty) {
+          final record = data.first;
 
-        setState(() {
-          patientName = record['patient_name'] ?? "Unknown";
-          nik = record['nik'] ?? "Unknown";
-          phoneNumber = record['phone_number'] ?? "Unknown";
-          bpjsNumber = record['bpjs_number'] ?? "-";
-          queueNumber = (data.indexOf(record) + 1).toString().padLeft(3, '0');
-        });
+          setState(() {
+            patientName = record['patient_name'] ?? "Unknown";
+            nik = record['nik'] ?? "Unknown";
+            phoneNumber = record['phone_number'] ?? "Unknown";
+            bpjsNumber = record['bpjs_number'] ?? "-";
+            // Menggunakan queue_number dari database atau menggunakan format default jika tidak ada
+            queueNumber = record['queue_number']?.toString().padLeft(3, '0') ?? 
+                         (data.indexOf(record) + 1).toString().padLeft(3, '0');
+          });
+        } else {
+          setState(() {
+            patientName = "No Data";
+            queueNumber = "001"; // Default queue number
+          });
+        }
       } else {
         setState(() {
-          patientName = "No Data";
-          queueNumber = "001"; // Default queue number
+          patientName = "Error Loading Data";
         });
       }
-    } else {
+    } catch (e) {
+      print("Error fetching patient data: $e");
       setState(() {
         patientName = "Error Loading Data";
       });
     }
-  } catch (e) {
-    print("Error fetching patient data: $e");
-    setState(() {
-      patientName = "Error Loading Data";
-    });
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
@@ -203,7 +203,7 @@ class _AntrianPeriksaWidgetState extends State<AntrianPeriksaWidget> {
               ),
             ),
             child: const Text(
-              "Cetak PDF",
+              "Cetak PNG",
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,

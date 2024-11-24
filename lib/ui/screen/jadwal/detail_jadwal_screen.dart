@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:alaremmu/ui/widget/jadwalperiksa/antrian_periksa_widget.dart';
-// import 'antrian_periksa_widget.dart'; // Import the AntrianPeriksaWidget
+import 'package:alaremmu/ui/widget/jadwalperiksa/penialaian_periksa_widget.dart';
 
 class DetailJadwalScreen extends StatelessWidget {
   final String doctorName;
   final String appointmentDate;
   final String appointmentTime;
+  final String status; // Tambahkan parameter status
 
   const DetailJadwalScreen({
     required this.doctorName,
     required this.appointmentDate,
     required this.appointmentTime,
+    required this.status, // Tambahkan parameter status
     Key? key,
   }) : super(key: key);
 
@@ -197,6 +199,15 @@ class DetailJadwalScreen extends StatelessWidget {
                     appointmentTime: appointmentTime,
                   ),
                 ),
+
+                // Penilaian Widget (Hanya untuk status "done")
+                if (status == 'done') ...[
+                  SizedBox(height: 16),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: PenilaianPeriksaWidget(),
+                  ),
+                ],
               ],
             ),
           );
